@@ -6,7 +6,7 @@
     let error = null;
     onMount(async () => {
             try {
-            const res = await axios.get(`https://jsonplaceholder.typicode.com/users`);
+            const res = await axios.get(`https://api.rawg.io/api/games?page_size=20`);
             users = res.data;
             console.log(res.data)
         } catch (e) {
