@@ -3,6 +3,15 @@
 @tailwind utilities;
 
 .background_image{
-    min-height: 200px;
+    height: 200px;
     object-fit: cover;
+}
+
+.bg-transparent{
+    filter: brightness(0.5)!important;
+    opacity: 0.9 !important;
+}
+
+.info-card-section{
+    height: 230px!important;
 }

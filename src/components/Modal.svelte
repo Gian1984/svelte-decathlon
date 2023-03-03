@@ -11,7 +11,7 @@
 </script>
 {#if game !== null}
 <div class="modal z-50 fixed w-full h-full top-0 left-0 flex items-center justify-center p-8 lg:p-0">
-    <div class="modal-overlay fixed w-full h-full bg-gray-900 opacity-50"></div>
+    <div class="modal-overlay fixed w-full h-full bg-gray-50 bg-opacity-75 transition-opacity"></div>
     <div class="bg-white w-full lg:h-max lg:w-1/2  mx-auto rounded-lg shadow-xl z-50 overflow-y-auto">
         <div class="flex justify-between items-center head bg-gray-100 py-5 px-8 text-2xl font-extrabold">
             {game.name}
@@ -34,4 +34,6 @@
         </div>
     </div>
 </div>
+
+
 {/if}
