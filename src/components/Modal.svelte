@@ -79,7 +79,7 @@
                                 </div>
 
                                 <div class="mt-4 lg:mt-6 xl:col-span-2 xl:mt-0">
-                                    <h3 class="text-sm font-medium text-gray-900">{rate.title}</h3>
+                                    <h3 class="text-sm font-medium text-gray-900">"{rate.title}"</h3>
 
                                     <div class="my-3 space-y-6 text-sm text-gray-500">
                                         <p>I was really pleased with the overall shopping experience. My order even included a little personal, handwritten note, which delighted me!</p>

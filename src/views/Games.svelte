@@ -1,28 +1,32 @@
 <script>
-    import {location} from 'svelte-spa-router'
-    import {cache, timeout} from "../store.js"
     import { createEventDispatcher, setContext } from 'svelte';
     import { onMount } from 'svelte';
-    import axios from 'axios';
+
     import Modal from '../components/Modal.svelte'
+
+    import {cache, timeout} from "../store.js"
+    import axios from 'axios';
+
+    //  data collection
     const dispatch = createEventDispatcher();
-
-
     $: searchQuery= '';
     const PAGE_SIZE = 10;
     let currentPage = 1;
     let totalPages = 1;
     let games = [];
     let selectedItem = null;
-    let resultItem = null
+    let resultItem = null;
 
+
+   // get data function
     async function fetchItems()  {
+
+        // check cache & timout in the store before fetch
         if($cache.length<1 || $timeout == true) {
             const res = await axios.get(`https://api.rawg.io/api/games?key=855e8fead27a4466b0d05ad24f6a36af`);
             games = res.data.results;
             $cache = res.data.results;
-            console.log(games)
-                totalPages = Math.ceil(games.length / PAGE_SIZE);
+            totalPages = Math.ceil(games.length / PAGE_SIZE);
             setContext('pagination', {
                 currentPage,
                 totalPages,
@@ -34,7 +38,6 @@
         }
 
         games = $cache
-        console.log(games)
         totalPages = Math.ceil(games.length / PAGE_SIZE);
         setContext('pagination', {
             currentPage,
@@ -46,12 +49,13 @@
         setContext('games', games);
     }
 
+    // filter
     $: filterGames = games.filter(item => {
         const regex = new RegExp(searchQuery, 'i');
         return regex.test(item.name);
     });
 
-
+    // pagination block function start
     function updatePagination(page) {
         currentPage = page;
         dispatch('change', currentPage);
@@ -74,19 +78,19 @@
             updatePagination(currentPage - 1);
         }
     }
+    // pagination block function end
 
+    // open modal
     function showModal(item) {
-        console.log(item)
         selectedItem = item;
     }
 
+    // close modal
     function handleClose() {
         selectedItem = null;
     }
 
-
     onMount(fetchItems)
-
 
 </script>
 
@@ -94,87 +98,95 @@
     <div class="pt-16 sm:pt-24 lg:mx-auto xl:container lg:px-8">
         <div class="flex items-center justify-between px-4 sm:px-6 lg:px-0">
             <h2 class="text-6xl font-bold tracking-tight text-white">New & Trending </h2>
-            <p class="text-white text-lg">Based on player counts and release date</p>
         </div>
 
-        <div>
+        <!-- filter input -->
+        <div class="px-4">
             <label for="name" class="mt-5 block text-sm font-medium text-gray-300">
                 Find your game here!
             </label>
             <input type="search" on:input={e => searchQuery = e.target.value} name="name" id="name"  class="font-light mt-1 bg-neutral-900 text-gray-300 appearance-none block w-full px-3 py-2 border border-white rounded-md shadow-sm placeholder-gray-500 placeholder-opacity-75 focus:outline-none focus:ring-yellow-300 focus:border-yellow-300 sm:text-sm " placeholder="Enter a search" />
         </div>
 
+        <!-- filter result -->
         {#if searchQuery}
+            <div class="px-4">
+                <div class="border-2 border-neutral-900 rounded ">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-1 py-2 px-2">
 
-        <div>
+                        {#each filterGames as result}
+                            <div class="relative rounded border border-gray-300 bg-neutral-800 px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-white">
+                                <button on:click={() => console.log('click'), showModal(result)} class="flex items-center justify-center">
+                                    <span class="h-2 w-2 rounded-full items-center justify-center ring-4 ring-white"></span>
+                                    <p class="text-white ml-2">{ result.name }</p>
+                                </button>
+                            </div>
+                        {/each}
 
-            <div  class="border-2 border-orange-300 rounded mt-2">
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-1 py-2 px-2">
+                        <!-- modal -->
+                        {#if selectedItem}
+                            <Modal result={resultItem} onclose={() => handleClose()} />
+                        {/if}
 
-
-                    {#each filterGames as result}
-                    <div class="relative rounded border border-gray-300 bg-neutral-800 px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-white">
-                        <div class="flex-shrink-0">
-                            <button on:click={() => showModal(result)} class="h-2 w-2 rounded-full flex items-center justify-center ring-4 ring-white"></button>
-                        </div>
-                        <div class="flex-1 min-w-0">
-
-                                <span class="absolute inset-0" aria-hidden="true" />
-                                <p class="text-sm font-medium text-white">
-                                    { result.name }
-                                </p>
-                        </div>
                     </div>
-                    {/each}
-                    {#if selectedItem}
-                        <Modal result={resultItem} onclose={() => handleClose()} />
-                    {/if}
                 </div>
             </div>
-        </div>
         {/if}
 
-
-
+        <!-- main card block content & navigation -->
         <div class="relative mt-16">
+
+            <!-- card block content -->
             <div class="relative -mb-6 pb-6 flex justify-center">
                 <ul role="list" class="grid xs:grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
                     {#each games.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) as game}
+                        <li class="inline-flex w-64 flex-col text-center lg:w-auto">
+                            <div class="group relative">
+                                <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200">
+                                    <img  src="{game.background_image}" alt="single-game-{game.name}" class="h-full w-full object-center group-hover:opacity-75 background_image">
+                                </div>
+                                <div class="mt-6 info-card-section">
 
-                    <li class="inline-flex w-64 flex-col text-center lg:w-auto">
-                        <div class="group relative">
-                            <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200">
-                                <img  src="{game.background_image}" alt="single-game-{game.name}" class="h-full w-full object-center group-hover:opacity-75 background_image">
-                            </div>
-                            <div class="mt-6 info-card-section">
-                                <h3 class="mt-1 font-semibold text-white">
-                                    <button on:click={() => showModal(game)}>
-                                        <span class="absolute inset-0 game-name"></span>
-                                        <p class="game-name">{game.name}</p>
-                                    </button>
-                                </h3>
-                                <p class="text-sm text-gray-300">Available platforms:</p>
-                                <div class="items-center space-x-2 py-1">
-                                    {#each game.parent_platforms as platforms}
-                                        <span class="inline-block flex-shrink-0 border border-yellow-300 rounded-full  px-2 py-0.5 text-xs font-medium text-yellow-300">{platforms.platform.name}</span>
-                                    {/each}
+                                    <!-- name -->
+                                    <h3 class="mt-1 font-semibold text-white">
+                                        <button on:click={() => showModal(game)}>
+                                            <span class="absolute inset-0 game-name"></span>
+                                            <p class="game-name">{game.name}</p>
+                                        </button>
+                                    </h3>
+
+                                    <!-- platforms -->
+                                    <p class="text-sm text-gray-300">Available platforms:</p>
+                                    <div class="items-center space-x-2 py-1">
+                                        {#each game.parent_platforms as platforms}
+                                            <span class="inline-block flex-shrink-0 border border-yellow-300 rounded-full  px-2 py-0.5 text-xs font-medium text-yellow-300">{platforms.platform.name}</span>
+                                        {/each}
+                                    </div>
+
+                                    <!-- metacritic -->
+                                    <p class="mt-1 text-sm text-gray-300">Metacritic: {game.metacritic} </p>
+
+                                    <!-- tags -->
+                                    <div class="items-center space-x-3">
+                                        {#each game.tags.slice(0, 2) as tag}
+                                        <span class="inline-block flex-shrink-0 rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">#{tag.name}</span>
+                                        {/each}
+                                    </div>
                                 </div>
-                                <p class="mt-1 text-sm text-gray-300">Metacritic: {game.metacritic} </p>
-                                <div class="items-center space-x-3">
-                                    {#each game.tags.slice(0, 2) as tag}
-                                    <span class="inline-block flex-shrink-0 rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">#{tag.name}</span>
-                                    {/each}
-                                </div>
                             </div>
-                        </div>
-                    </li>
+                        </li>
                     {/each}
+
+                    <!-- modal -->
                     {#if selectedItem}
                         <Modal game={selectedItem} onclose={() => handleClose()} />
                     {/if}
+
                 </ul>
             </div>
+
+            <!-- page navigation -->
             <nav class="flex items-center justify-between border-t border-gray-200 px-4 sm:px-0">
                 <div class="-mt-px flex w-0 flex-1">
                     <button on:click={prev} class="inline-flex items-center border-t-2 border-transparent pt-4 pr-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700">
@@ -196,6 +208,7 @@
                     </button>
                 </div>
             </nav>
+
         </div>
     </div>
 </div>
