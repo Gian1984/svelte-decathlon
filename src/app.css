@@ -15,3 +15,12 @@
 .info-card-section{
     height: 230px!important;
 }
+.game-name{
+    text-transform: uppercase!important;
+    letter-spacing: 1px!important;
+    margin-bottom: 10px;
+}
+
+.modal-main-img{
+    object-fit: cover;
+}

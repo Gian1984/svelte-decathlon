@@ -8,7 +8,7 @@
     const dispatch = createEventDispatcher();
 
 
-    let searchQuery= '';
+    $: searchQuery= '';
     const PAGE_SIZE = 10;
     let currentPage = 1;
     let totalPages = 1;
@@ -90,42 +90,39 @@
 
 </script>
 
-<div class="bg-white">
-    <div class="py-16 sm:py-24 lg:mx-auto lg:max-w-7xl lg:px-8">
+<div class="bg-neutral-900">
+    <div class="pt-16 sm:pt-24 lg:mx-auto xl:container lg:px-8">
         <div class="flex items-center justify-between px-4 sm:px-6 lg:px-0">
-            <h2 class="text-6xl font-bold tracking-tight text-gray-900">New & Trending </h2>
-            <p>Based on player counts and release date</p>
+            <h2 class="text-6xl font-bold tracking-tight text-white">New & Trending </h2>
+            <p class="text-white text-lg">Based on player counts and release date</p>
         </div>
 
         <div>
-            <label for="name" class="mt-5 block text-sm font-medium text-gray-700">
+            <label for="name" class="mt-5 block text-sm font-medium text-gray-300">
                 Find your game here!
             </label>
-            <input type="search" on:input={e => searchQuery = e.target.value} name="name" id="name"  class="mt-1 appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm" placeholder="Enter a search here!" />
+            <input type="search" on:input={e => searchQuery = e.target.value} name="name" id="name"  class="font-light mt-1 bg-neutral-900 text-gray-300 appearance-none block w-full px-3 py-2 border border-white rounded-md shadow-sm placeholder-gray-500 placeholder-opacity-75 focus:outline-none focus:ring-yellow-300 focus:border-yellow-300 sm:text-sm " placeholder="Enter a search" />
         </div>
 
-        {#if !searchQuery}
-        <p class="mb-2 text-right" ></p>
-
-        {:else if searchQuery && searchQuery.length >= 1 }
+        {#if searchQuery}
 
         <div>
 
-            <div  class="border-2 border-orange-300 rounded-2xl mt-2">
+            <div  class="border-2 border-orange-300 rounded mt-2">
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-1 py-2 px-2">
 
 
                     {#each filterGames as result}
-                    <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-teal-500">
+                    <div class="relative rounded border border-gray-300 bg-neutral-800 px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-white">
                         <div class="flex-shrink-0">
-                            <span class="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"></span>
+                            <button on:click={() => showModal(result)} class="h-2 w-2 rounded-full flex items-center justify-center ring-4 ring-white"></button>
                         </div>
                         <div class="flex-1 min-w-0">
 
                                 <span class="absolute inset-0" aria-hidden="true" />
-                                <button on:click={() => showModal(result)} class="text-sm font-medium text-gray-900">
+                                <p class="text-sm font-medium text-white">
                                     { result.name }
-                                </button>
+                                </p>
                         </div>
                     </div>
                     {/each}
@@ -148,25 +145,25 @@
                     <li class="inline-flex w-64 flex-col text-center lg:w-auto">
                         <div class="group relative">
                             <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200">
-                                <img  src="{game.background_image}" alt="Black machined steel pen with hexagonal grip and small white logo at top." class="h-full w-full object-center group-hover:opacity-75 background_image">
+                                <img  src="{game.background_image}" alt="single-game-{game.name}" class="h-full w-full object-center group-hover:opacity-75 background_image">
                             </div>
-                            <div class="mt-6 h-36 info-card-section">
-                                <h3 class="mt-1 font-semibold text-gray-900">
+                            <div class="mt-6 info-card-section">
+                                <h3 class="mt-1 font-semibold text-white">
                                     <button on:click={() => showModal(game)}>
-                                        <span class="absolute inset-0"></span>
-                                        {game.name}
+                                        <span class="absolute inset-0 game-name"></span>
+                                        <p class="game-name">{game.name}</p>
                                     </button>
                                 </h3>
-                                <p class="text-sm text-gray-500">Available platforms:</p>
-                                <div class="items-center space-x-2">
+                                <p class="text-sm text-gray-300">Available platforms:</p>
+                                <div class="items-center space-x-2 py-1">
                                     {#each game.parent_platforms as platforms}
-                                        <span class="inline-block flex-shrink-0 rounded-full bg-indigo-100 px-2 py-0.5 text-xs font-medium text-indigo-800">{platforms.platform.name}</span>
+                                        <span class="inline-block flex-shrink-0 border border-yellow-300 rounded-full  px-2 py-0.5 text-xs font-medium text-yellow-300">{platforms.platform.name}</span>
                                     {/each}
                                 </div>
-                                <p class="mt-1 text-gray-900">Metacritic: {game.metacritic} </p>
+                                <p class="mt-1 text-sm text-gray-300">Metacritic: {game.metacritic} </p>
                                 <div class="items-center space-x-3">
                                     {#each game.tags.slice(0, 2) as tag}
-                                    <span class="inline-block flex-shrink-0 rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-800">#{tag.name}</span>
+                                    <span class="inline-block flex-shrink-0 rounded-full bg-indigo-600 px-2 py-0.5 text-xs font-medium text-white">#{tag.name}</span>
                                     {/each}
                                 </div>
                             </div>
