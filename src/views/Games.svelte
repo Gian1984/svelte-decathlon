@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher, setContext } from 'svelte';
+    import { createEventDispatcher } from 'svelte';
     import { onMount } from 'svelte';
 
     import Modal from '../components/Modal.svelte'
@@ -27,26 +27,10 @@
             games = res.data.results;
             $cache = res.data.results;
             totalPages = Math.ceil(games.length / PAGE_SIZE);
-            setContext('pagination', {
-                currentPage,
-                totalPages,
-                goToPage,
-                next,
-                prev
-            });
-            setContext('games', games);
         }
 
         games = $cache
         totalPages = Math.ceil(games.length / PAGE_SIZE);
-        setContext('pagination', {
-            currentPage,
-            totalPages,
-            goToPage,
-            next,
-            prev
-        });
-        setContext('games', games);
     }
 
     // filter
@@ -138,10 +122,10 @@
 
             <!-- card block content -->
             <div class="relative -mb-6 pb-6 flex justify-center">
-                <ul role="list" class="grid xs:grid-cols-1  sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <ul role="list" class="grid grid-cols-2  sm:grid-cols-2 lg:grid-cols-4 gap-4 p-2">
 
                     {#each games.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE) as game}
-                        <li class="inline-flex w-64 flex-col text-center lg:w-auto">
+                        <li class="inline-flex xs:w-32 sm:w-64 flex-col text-center lg:w-auto">
                             <div class="group relative">
                                 <div class="aspect-w-1 aspect-h-1 w-full overflow-hidden rounded-md bg-gray-200">
                                     <img  src="{game.background_image}" alt="single-game-{game.name}" class="h-full w-full object-center group-hover:opacity-75 background_image">
