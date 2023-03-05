@@ -10,6 +10,8 @@
     //  data collection
     const dispatch = createEventDispatcher();
     $: searchQuery= '';
+    let filter = 1;
+    let placeholderText = 'Search by name';
     const PAGE_SIZE = 10;
     let currentPage = 1;
     let totalPages = 1;
@@ -25,18 +27,39 @@
         if($cache.length<1 || $timeout == true) {
             const res = await axios.get(`https://api.rawg.io/api/games?key=855e8fead27a4466b0d05ad24f6a36af`);
             games = res.data.results;
+            console.log(games)
             $cache = res.data.results;
             totalPages = Math.ceil(games.length / PAGE_SIZE);
         }
 
         games = $cache
+        console.log(games)
         totalPages = Math.ceil(games.length / PAGE_SIZE);
+    }
+
+    function updateVar(value) {
+        filter = value;
+        console.log(filter)
     }
 
     // filter
     $: filterGames = games.filter(item => {
-        const regex = new RegExp(searchQuery, 'i');
-        return regex.test(item.name);
+        let name = item.name
+        let released = item.released
+        let rating = item.rating
+        if(filter == 1  ){
+            placeholderText = 'Search by name';
+            const regex = new RegExp(searchQuery, 'i');
+            return regex.test(name);
+        } else if ( filter == 2){
+            placeholderText = 'Search by release ( Ex: 2015-02-20 )';
+            const regex = new RegExp(searchQuery, 'i');
+            return regex.test(released);
+        } else {
+            placeholderText = 'Search by rating ( Ex: 4.42 )';
+            const regex = new RegExp(searchQuery, 'i');
+            return regex.test(rating);
+        }
     });
 
     // pagination block function start
@@ -84,12 +107,24 @@
             <h2 class="text-6xl font-bold tracking-tight text-white">New & Trending </h2>
         </div>
 
+
         <!-- filter input -->
         <div class="px-4">
-            <label for="name" class="mt-5 block text-sm font-medium text-gray-300">
+            <p  class="mt-5 block text-sm font-medium text-gray-300">
                 Find your game here!
-            </label>
-            <input type="search" on:input={e => searchQuery = e.target.value} name="name" id="name"  class="font-light mt-1 bg-neutral-900 text-gray-300 appearance-none block w-full px-3 py-2 border border-white rounded-md shadow-sm placeholder-gray-500 placeholder-opacity-75 focus:outline-none focus:ring-yellow-300 focus:border-yellow-300 sm:text-sm " placeholder="Enter a search" />
+            </p>
+            <div class="inline-flex rounded-md shadow-sm my-3" role="group">
+                <button type="button" on:click={() => updateVar(1)} class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-l-lg hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+                    By name
+                </button>
+                <button type="button" on:click={() => updateVar(2)} class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+                    Release date
+                </button>
+                <button type="button" on:click={() => updateVar(3)} class="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-r-md hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-2 focus:ring-blue-700 focus:text-blue-700 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-blue-500 dark:focus:text-white">
+                    Rating
+                </button>
+            </div>
+            <input type="search" on:input={e => searchQuery = e.target.value} name="name" id="name"  class="font-light mt-1 bg-neutral-900 text-gray-300 appearance-none block w-full px-3 py-2 border border-white rounded-md shadow-sm placeholder-gray-500 placeholder-opacity-75 focus:outline-none focus:ring-yellow-300 focus:border-yellow-300 sm:text-sm " placeholder={placeholderText} />
         </div>
 
         <!-- filter result -->
