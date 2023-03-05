@@ -27,13 +27,11 @@
         if($cache.length<1 || $timeout == true) {
             const res = await axios.get(`https://api.rawg.io/api/games?key=855e8fead27a4466b0d05ad24f6a36af`);
             games = res.data.results;
-            console.log(games)
             $cache = res.data.results;
             totalPages = Math.ceil(games.length / PAGE_SIZE);
         }
 
         games = $cache
-        console.log(games)
         totalPages = Math.ceil(games.length / PAGE_SIZE);
     }
 
